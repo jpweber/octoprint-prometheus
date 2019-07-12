@@ -62,7 +62,7 @@ class PrometheusPlugin(octoprint.plugin.StartupPlugin,
             self.last_extrusion_counter = 0
             self.completion_timer = None
 
-            self.gauges["octoprint_printer_state"] = Enum("printer_state",
+            self.gauges["octoprint_printer_state"] = Enum("octoprint_printer_state",
                                                 "State of printer",
                                                 states=["init", "printing", "done", "failed", "cancelled", "idle"])
             self.gauges["octoprint_printer_state"].state("init")
