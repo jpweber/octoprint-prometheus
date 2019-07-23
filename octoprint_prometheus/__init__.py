@@ -117,7 +117,7 @@ class PrometheusPlugin(octoprint.plugin.StartupPlugin,
             return self.gauges[name]
 
         def on_print_progress(self, storage, path, progress):
-                gauge = self.get_gauge("progress")
+                gauge = self.get_gauge("octoprint_progress")
                 gauge.set(progress)
 
         def print_complete_callback(self):
@@ -143,7 +143,7 @@ class PrometheusPlugin(octoprint.plugin.StartupPlugin,
         def on_event(self, event, payload):
                 if event == "ZChange":
                     # TODO: This doesn't seem useful...
-                    gauge = self.get_gauge("octoprint_octoprint_zchange")
+                    gauge = self.get_gauge("octoprint_zchange")
                     gauge.set(payload["new"])
                 elif event == "PrintStarted":
                     # If there's a completion timer running, kill it.
