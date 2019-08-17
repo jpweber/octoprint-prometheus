@@ -53,6 +53,8 @@ class PrometheusPlugin(octoprint.plugin.StartupPlugin,
                         "progress": "Progress percentage of print",
                         "printing": "1 if printing, 0 otherwise",
                         "print": "Filename information about print",
+                        "print_time": "Time passing of print",
+                        "print_time_left": "Time left of print"
                         }
 
         def __init__(self, *args, **kwargs):
@@ -87,6 +89,8 @@ class PrometheusPlugin(octoprint.plugin.StartupPlugin,
             self.init_gauge("temperature_tool3_actual")
             self.init_gauge("temperature_tool3_target")
             self.init_gauge("print_fan_speed")
+            self.init_gauge("print_time")
+            self.init_gauge("print_time_left")
 
             self.init_counter("extrusion_total")
 
@@ -203,6 +207,14 @@ class PrometheusPlugin(octoprint.plugin.StartupPlugin,
                     if v is not None:
                         gauge = self.get_gauge("print_fan_speed")
                         gauge.set(v)
+
+                currentData = self._printer.get_current_data()
+                printTime = currentData["progress"]["printTime"]
+                if printTime is not None:
+                    self.get_gauge('print_time').set(printTime)
+                printTimeLeft = currentData["progress"]["printTimeLeft"]
+                if printTimeLeft is not None:
+                    self.get_gauge('print_time_left').set(printTimeLeft)
 
             return None  # no change
 
