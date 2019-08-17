@@ -129,6 +129,8 @@ class PrometheusPlugin(octoprint.plugin.StartupPlugin,
             self.get_gauge("progress").set(0)
             self.get_gauge("extrusion_print").set(0)
             self.get_gauge("print").info({})   # This doesn't actually cause it to reset...
+            self.get_gauge("print_time").set(0)
+            self.get_gauge("print_time_left").set(0)
             self.completion_timer = None
 
         def print_complete(self, reason):
