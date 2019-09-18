@@ -1,4 +1,5 @@
-# Prometheus Client for OctoPrint Forked from Scott Baker https://github.com/sbelectronics/octoprint-prometheus
+# Prometheus Client for OctoPrint  
+Forked from Scott Baker https://github.com/sbelectronics/octoprint-prometheus
 
 ## Purpose ##
 
