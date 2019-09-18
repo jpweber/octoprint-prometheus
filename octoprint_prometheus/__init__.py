@@ -39,20 +39,20 @@ class PrometheusPlugin(octoprint.plugin.StartupPlugin,
                        octoprint.plugin.ProgressPlugin,
                        octoprint.plugin.EventHandlerPlugin):
 
-        DESCRIPTIONS = {"temperature_bed_actual": "Actual Temperature in Celsius of Bed",
-                        "temperature_bed__target": "Target Temperature in Celsius of Bed",
-                        "temperature_tool0_actual": "Actual Temperature in Celsius of Extruder Hot End",
-                        "temperature_tool0__target": "Target Temperature in Celsius of Extruder Hot End",
-                        "movement_x": "Movement of X axis from G0 or G1 gcode",
-                        "movement_y": "Movement of Y axis from G0 or G1 gcode",
-                        "movement_z": "Movement of Z axis from G0 or G1 gcode",
-                        "movement_e": "Movement of Extruder from G0 or G1 gcode",
-                        "movement_speed": "Speed setting from G0 or G1 gcode",
-                        "extrusion_print": "Filament extruded this print",
-                        "extrusion_total": "Filament extruded total",
-                        "progress": "Progress percentage of print",
-                        "printing": "1 if printing, 0 otherwise",
-                        "print": "Filename information about print",
+        DESCRIPTIONS = {"octoprint_temperature_bed_actual": "Actual Temperature in Celsius of Bed",
+                        "octoprint_temperature_bed__target": "Target Temperature in Celsius of Bed",
+                        "octoprint_temperature_tool0_actual": "Actual Temperature in Celsius of Extruder Hot End",
+                        "octoprint_temperature_tool0__target": "Target Temperature in Celsius of Extruder Hot End",
+                        "octoprint_movement_x": "Movement of X axis from G0 or G1 gcode",
+                        "octoprint_movement_y": "Movement of Y axis from G0 or G1 gcode",
+                        "octoprint_movement_z": "Movement of Z axis from G0 or G1 gcode",
+                        "octoprint_movement_e": "Movement of Extruder from G0 or G1 gcode",
+                        "octoprint_movement_speed": "Speed setting from G0 or G1 gcode",
+                        "octoprint_extrusion_print": "Filament extruded this print",
+                        "octoprint_extrusion_total": "Filament extruded total",
+                        "octoprint_progress": "Progress percentage of print",
+                        "octoprint_printing": "1 if printing, 0 otherwise",
+                        "octoprint_print": "Filename information about print",
                         }
 
         def __init__(self, *args, **kwargs):
@@ -62,35 +62,35 @@ class PrometheusPlugin(octoprint.plugin.StartupPlugin,
             self.last_extrusion_counter = 0
             self.completion_timer = None
 
-            self.gauges["printer_state"] = Enum("printer_state",
+            self.gauges["octoprint_printer_state"] = Enum("octoprint_printer_state",
                                                 "State of printer",
                                                 states=["init", "printing", "done", "failed", "cancelled", "idle"])
-            self.gauges["printer_state"].state("init")
+            self.gauges["octoprint_printer_state"].state("init")
 
-            self.init_gauge("progress")
-            self.init_gauge("extrusion_print")
-            self.init_gauge("printing")
-            self.init_gauge("zchange")
-            self.init_gauge("movement_x")
-            self.init_gauge("movement_y")
-            self.init_gauge("movement_z")
-            self.init_gauge("movement_e")
-            self.init_gauge("movement_speed")
-            self.init_gauge("temperature_bed_actual")
-            self.init_gauge("temperature_bed_target")
-            self.init_gauge("temperature_tool0_actual")
-            self.init_gauge("temperature_tool0_target")
-            self.init_gauge("temperature_tool1_actual")
-            self.init_gauge("temperature_tool1_target")
-            self.init_gauge("temperature_tool2_actual")
-            self.init_gauge("temperature_tool2_target")
-            self.init_gauge("temperature_tool3_actual")
-            self.init_gauge("temperature_tool3_target")
-            self.init_gauge("print_fan_speed")
+            self.init_gauge("octoprint_progress")
+            self.init_gauge("octoprint_extrusion_print")
+            self.init_gauge("octoprint_printing")
+            self.init_gauge("octoprint_zchange")
+            self.init_gauge("octoprint_movement_x")
+            self.init_gauge("octoprint_movement_y")
+            self.init_gauge("octoprint_movement_z")
+            self.init_gauge("octoprint_movement_e")
+            self.init_gauge("octoprint_movement_speed")
+            self.init_gauge("octoprint_temperature_bed_actual")
+            self.init_gauge("octoprint_temperature_bed_target")
+            self.init_gauge("octoprint_temperature_tool0_actual")
+            self.init_gauge("octoprint_temperature_tool0_target")
+            self.init_gauge("octoprint_temperature_tool1_actual")
+            self.init_gauge("octoprint_temperature_tool1_target")
+            self.init_gauge("octoprint_temperature_tool2_actual")
+            self.init_gauge("octoprint_temperature_tool2_target")
+            self.init_gauge("octoprint_temperature_tool3_actual")
+            self.init_gauge("octoprint_temperature_tool3_target")
+            self.init_gauge("octoprint_print_fan_speed")
 
-            self.init_counter("extrusion_total")
+            self.init_counter("octoprint_extrusion_total")
 
-            self.init_info("print")
+            self.init_info("octoprint_print")
 
         def on_after_startup(self):
             self._logger.info("Starting Prometheus! (port: %s)" % self._settings.get(["prometheus_port"]))
@@ -117,19 +117,19 @@ class PrometheusPlugin(octoprint.plugin.StartupPlugin,
             return self.gauges[name]
 
         def on_print_progress(self, storage, path, progress):
-                gauge = self.get_gauge("progress")
+                gauge = self.get_gauge("octoprint_progress")
                 gauge.set(progress)
 
         def print_complete_callback(self):
-            self.get_gauge("printer_state").state("idle")
-            self.get_gauge("progress").set(0)
-            self.get_gauge("extrusion_print").set(0)
-            self.get_gauge("print").info({})   # This doesn't actually cause it to reset...
+            self.get_gauge("octoprint_printer_state").state("idle")
+            self.get_gauge("octoprint_progress").set(0)
+            self.get_gauge("octoprint_extrusion_print").set(0)
+            self.get_gauge("octoprint_print").info({})   # This doesn't actually cause it to reset...
             self.completion_timer = None
 
         def print_complete(self, reason):
-            self.get_gauge("printer_state").state(reason)
-            self.get_gauge("printing").set(0)  # TODO: may be redundant with printer_state
+            self.get_gauge("octoprint_printer_state").state(reason)
+            self.get_gauge("octoprint_printing").set(0)  # TODO: may be redundant with printer_state
 
             # In 30 seconds, reset all the progress variables back to 0
             # At a default 10 second interval, this gives us plenty of room for Prometheus to capture the 100%
@@ -143,7 +143,7 @@ class PrometheusPlugin(octoprint.plugin.StartupPlugin,
         def on_event(self, event, payload):
                 if event == "ZChange":
                     # TODO: This doesn't seem useful...
-                    gauge = self.get_gauge("zchange")
+                    gauge = self.get_gauge("octoprint_zchange")
                     gauge.set(payload["new"])
                 elif event == "PrintStarted":
                     # If there's a completion timer running, kill it.
@@ -154,9 +154,9 @@ class PrometheusPlugin(octoprint.plugin.StartupPlugin,
                     # reset the extrusion counter
                     self.parser.reset()
                     self.last_extrusion_counter = 0
-                    self.get_gauge("printing").set(1)  # TODO: may be redundant with printer_state
-                    self.get_gauge("printer_state").state("printing")
-                    self.get_gauge("print").info({"name": payload.get("name", ""),
+                    self.get_gauge("octoprint_printing").set(1)  # TODO: may be redundant with printer_state
+                    self.get_gauge("octoprint_printer_state").state("printing")
+                    self.get_gauge("octoprint_print").info({"name": payload.get("name", ""),
                                                   "path": payload.get("path", ""),
                                                   "origin": payload.get("origin", "")})
                 elif event == "PrintFailed":
@@ -185,34 +185,34 @@ class PrometheusPlugin(octoprint.plugin.StartupPlugin,
                     for k in ["x", "y", "z", "e", "speed"]:
                         v = getattr(self.parser, k)
                         if v is not None:
-                            gauge = self.get_gauge("movement_" + k)
+                            gauge = self.get_gauge("octoprint_movement_" + k)
                             gauge.set(v)
 
                     # extrusion_print is modeled as a gauge so we can reset it after every print
-                    gauge = self.get_gauge("extrusion_print")
+                    gauge = self.get_gauge("octoprint_extrusion_print")
                     gauge.set(self.parser.extrusion_counter)
 
                     if self.parser.extrusion_counter > self.last_extrusion_counter:
                         # extrusion_total is monotonically increasing for the lifetime of the plugin
-                        counter = self.get_gauge("extrusion_total")
+                        counter = self.get_gauge("octoprint_extrusion_total")
                         counter.inc(self.parser.extrusion_counter - self.last_extrusion_counter)
                         self.last_extrusion_counter = self.parser.extrusion_counter
 
-                elif parse_result == "print_fan_speed":
-                    v = getattr(self.parser, "print_fan_speed")
+                elif parse_result == "octoprint_print_fan_speed":
+                    v = getattr(self.parser, "octoprint_print_fan_speed")
                     if v is not None:
-                        gauge = self.get_gauge("print_fan_speed")
+                        gauge = self.get_gauge("octoprint_print_fan_speed")
                         gauge.set(v)
 
             return None  # no change
 
         def temperatures_handler(self, comm, parsed_temps):
             for (k, v) in parsed_temps.items():
-                mapname = {"B": "temperature_bed",
-                           "T0": "temperature_tool0",
-                           "T1": "temperature_tool1",
-                           "T2": "temperature_tool2",
-                           "T3": "temperature_tool3"}
+                mapname = {"B": "octoprint_temperature_bed",
+                           "T0": "octoprint_temperature_tool0",
+                           "T1": "octoprint_temperature_tool1",
+                           "T2": "octoprint_temperature_tool2",
+                           "T3": "octoprint_temperature_tool3"}
 
                 # We only support four tools. If someone runs into a printer with more tools, please
                 # let me know...
