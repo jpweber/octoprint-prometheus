@@ -43,17 +43,17 @@ class PrometheusPlugin(octoprint.plugin.StartupPlugin,
                        octoprint.plugin.EventHandlerPlugin,
                        octoprint.plugin.BlueprintPlugin):
 
-        @octoprint.plugin.BlueprintPlugin.route("/metrics", methods=["GET"])
-        def metrics_proxy(self):
-            self._logger.info("Prometheus Proxy (Exposed: %s)" % bool(self._settings.get(["prometheus_exposed"])))
-            if not bool(self._settings.get(["prometheus_exposed"])):
-                self._logger.info("Prometheus metrics are not exposed")
-                abort(404)
+    @octoprint.plugin.BlueprintPlugin.route("/metrics", methods=["GET"])
+    def metrics_proxy(self):
+        self._logger.info("Prometheus Proxy (Exposed: %s)" % bool(self._settings.get(["prometheus_exposed"])))
+        if not bool(self._settings.get(["prometheus_exposed"])):
+            self._logger.info("Prometheus metrics are not exposed")
+            abort(404)
 
-            conn = httplib.HTTPConnection("localhost", int(self._settings.get(["prometheus_port"])))
-            conn.request("GET", "/metrics")
-            resp = conn.getresponse()
-            return Response(response=resp.read(), status=resp.status, content_type=resp.getheader('content-type'))
+        conn = httplib.HTTPConnection("localhost", int(self._settings.get(["prometheus_port"])))
+        conn.request("GET", "/metrics")
+        resp = conn.getresponse()
+        return Response(response=resp.read(), status=resp.status, content_type=resp.getheader('content-type'))
 
     DESCRIPTIONS = {"octoprint_temperature_bed_actual": "Actual Temperature in Celsius of Bed",
                     "octoprint_temperature_bed__target": "Target Temperature in Celsius of Bed",
